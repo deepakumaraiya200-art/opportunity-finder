@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Upload your resume and let AI find the perfect internship matches for your skills and experience.">
+  <title>InternFinder — AI-Powered Internship Matching</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- Animated Background Orbs -->
+  <div class="bg-animation">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <!-- Upload Page -->
+  <main class="upload-page">
+
+    <!-- Branding -->
+    <div class="brand">
+      <div class="brand-icon">🎯</div>
+      <h1>InternFinder</h1>
+      <p>AI-powered internship matching — upload your resume, get results instantly.</p>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="upload-card">
+      <form id="uploadForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+          <span class="drop-zone-icon">📄</span>
+          <div class="drop-zone-text">
+            <h3>Drag & drop your resume here</h3>
+            <p>or <span class="browse-link">browse files</span></p>
+            <p style="margin-top: 8px;">PDF only · Max 5MB</p>
+          </div>
+          <input type="file" name="resume" id="fileInput" accept=".pdf" hidden>
+        </div>
+
+        <!-- File Preview -->
+        <div class="file-preview" id="filePreview">
+          <div class="file-preview-icon">📎</div>
+          <div class="file-preview-info">
+            <div class="file-preview-name" id="fileName"></div>
+            <div class="file-preview-size" id="fileSize"></div>
+          </div>
+          <button type="button" class="file-preview-remove" id="removeFile">✕</button>
+        </div>
+
+        <!-- Internship Count Selector -->
+        <div class="count-selector" id="countSelector">
+          <label for="jobCount">
+            <span class="count-label">📊 Number of internships to show</span>
+            <span class="count-value" id="countValue">20</span>
+          </label>
+          <input type="range" name="job_count" id="jobCount" min="10" max="50" value="20" step="5">
+          <div class="count-hints">
+            <span>10</span>
+            <span>Fewer but best matches</span>
+            <span>50</span>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="upload-btn" id="uploadBtn" disabled>
+          🚀 Analyze My Resume
+        </button>
+      </form>
+    </div>
+
+  </main>
+
+  <!-- Loading Overlay — Premium animated design -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-card">
+      <!-- Animated rings -->
+      <div class="loading-rings">
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+        <div class="ring ring-3"></div>
+        <div class="loading-pct" id="loadingPct">0%</div>
+      </div>
+
+      <h3 class="loading-title" id="loadingTitle">Initializing AI Engine</h3>
+      <p class="loading-subtitle" id="loadingSubtitle">Preparing to analyze your resume</p>
+
+      <!-- Progress bar -->
+      <div class="loading-progress">
+        <div class="loading-progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+
+      <!-- Step indicators -->
+      <div class="loading-steps-v2">
+        <div class="lstep active" id="lstep-0">
+          <div class="lstep-icon">📄</div>
+          <div class="lstep-text">Reading Resume</div>
+        </div>
+        <div class="lstep-connector"></div>
+        <div class="lstep" id="lstep-1">
+          <div class="lstep-icon">🧠</div>
+          <div class="lstep-text">Extracting Skills</div>
+        </div>
+        <div class="lstep-connector"></div>
+        <div class="lstep" id="lstep-2">
+          <div class="lstep-icon">🔍</div>
+          <div class="lstep-text">Finding Jobs</div>
+        </div>
+        <div class="lstep-connector"></div>
+        <div class="lstep" id="lstep-3">
+          <div class="lstep-icon">✨</div>
+          <div class="lstep-text">AI Scoring</div>
+        </div>
+      </div>
+
+      <div class="loading-fun-fact" id="loadingFact">
+        💡 We scan 5+ job platforms including Internshala, Unstop & LinkedIn
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="toast visible" id="toast">{{ messages[0] }}</div>
+      <script>setTimeout(() => document.getElementById('toast').classList.remove('visible'), 4000);</script>
+    {% endif %}
+  {% endwith %}
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

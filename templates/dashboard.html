@@ -1,0 +1,221 @@
+{% macro render_job_card(job, idx) %}
+<div class="card" data-cat="{{ job.category }}" data-tier="{{ job.tier }}">
+  <div class="card-num">#{{ '%02d' | format(idx) }}</div>
+  <div class="card-top">
+    <div>
+      <div class="company">{{ job.company }}</div>
+      <div class="role">{{ job.role }}</div>
+    </div>
+    <div class="deadline {{ job.deadline_status }}">
+      {% if job.deadline_status == 'urgent' %}🔥{% elif job.deadline_status == 'soon' %}🟡{% else %}🟢{% endif %}
+      {{ job.deadline_text }}
+    </div>
+  </div>
+  <div class="meta">
+    {% if job.location %}<span class="chip loc">📍 {{ job.location }}</span>{% endif %}
+    {% if job.duration %}<span class="chip dur">⏱ {{ job.duration }}</span>{% endif %}
+    {% if job.stipend %}<span class="chip pay">💰 {{ job.stipend }}</span>{% endif %}
+    {% if job.work_mode %}<span class="chip mode">{% if job.work_mode == 'Remote' %}🌐{% elif job.work_mode == 'Hybrid'
+      %}🌐{% else %}🏢{% endif %} {{ job.work_mode }}</span>{% endif %}
+  </div>
+  <div class="skills">
+    {% for s in job.matched_skills %}<span class="skill matched">{{ s }}</span>{% endfor %}
+    {% for s in job.missing_skills %}<span class="skill missing">{{ s }}</span>{% endfor %}
+  </div>
+  <div class="match">
+    <span class="match-lbl">Profile</span>
+    <div class="match-bar">
+      <div class="match-fill" style="width:{{ job.match_percentage }}%"></div>
+    </div>
+    <span class="match-pct">{{ job.match_percentage }}%</span>
+  </div>
+  <div class="card-footer">
+    {% if job.verified %}
+    <span class="source-tag verified">{{ job.source_text }}</span>
+    <a class="apply-btn" href="{{ job.apply_url }}" target="_blank" rel="noopener">
+      Apply Now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+    </a>
+    {% else %}
+    <span class="source-tag ai-suggested">{{ job.source_text }}</span>
+    <a class="apply-btn search-btn" href="{{ job.apply_url }}" target="_blank" rel="noopener">
+      🔍 Search &amp; Apply <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your personalized internship matches powered by AI analysis of your resume.">
+  <title>Your Matches — InternFinder</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div class="live-badge">
+      <div class="pulse"></div> AI-Curated · Live Results
+    </div>
+    <h1>Your Personalized Internship Matches</h1>
+    <div class="header-sub">Curated for <span>your profile</span> · Based on your resume analysis</div>
+    <div class="stats-strip">
+      <div class="stat-pill">
+        <div class="num">{{ jobs | length }}</div>
+        <div class="lbl">Total Matches</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num">
+          {% if jobs %}{{ (jobs | map(attribute='match_percentage') | list | sum / jobs | length) | round(0) | int }}%{%
+          else %}0%{% endif %}
+        </div>
+        <div class="lbl">Avg Match</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num">{{ jobs | selectattr('tier', 'equalto', 'S') | list | length }}</div>
+        <div class="lbl">FAANG Tier</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num">
+          {% set urgent_jobs = jobs | selectattr('deadline_status', 'equalto', 'urgent') | list %}
+          {{ urgent_jobs | length }}
+        </div>
+        <div class="lbl">Closing Soon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Banner for Urgent -->
+  {% set urgent_jobs = jobs | selectattr('deadline_status', 'equalto', 'urgent') | list %}
+  {% if urgent_jobs %}
+  <div class="alert-banner">
+    ⚡ <strong>{{ urgent_jobs | length }} listing{{ 's' if urgent_jobs | length != 1 }} closing very soon.</strong>&nbsp;
+    Apply to {{ urgent_jobs[:3] | map(attribute='company') | join(', ') }} first.
+  </div>
+  {% endif %}
+
+  <!-- Skills Summary -->
+  {% if skills %}
+  <div class="skills-summary">
+    <h3>🧠 Your Detected Skills</h3>
+    <div class="skills-tags">
+      {% for skill in skills %}
+      <span class="skill-tag">{{ skill }}</span>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Filters -->
+  <div class="filters" id="filterBar">
+    <button class="filter-btn active" data-cat="all" id="filter-all">All ({{ jobs | length }})</button>
+    <button class="filter-btn" data-cat="faang" id="filter-faang">🏆 FAANG</button>
+    <button class="filter-btn" data-cat="startup" id="filter-startup">🚀 Startups</button>
+    <button class="filter-btn" data-cat="research" id="filter-research">🔬 Research</button>
+    <button class="filter-btn" data-cat="urgent" id="filter-urgent">🔥 Closing Soon</button>
+    <input type="text" class="search-box" id="searchBox" placeholder="Search company, role, skill...">
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- URGENT / CLOSING SOON -->
+    {% set urgent_list = jobs | selectattr('deadline_status', 'equalto', 'urgent') | list %}
+    {% if urgent_list %}
+    <div class="section-label" data-section="urgent">
+      <div class="section-title" style="color:#ef4444;">🔥 Closing Soon — Apply ASAP</div>
+      <div class="section-line" style="background:rgba(239,68,68,0.2)"></div>
+      <div class="count-badge">{{ urgent_list | length }} listing{{ 's' if urgent_list | length != 1 }}</div>
+    </div>
+    <div class="grid" data-grid="urgent">
+      {% for job in urgent_list %}
+      {{ render_job_card(job, loop.index) }}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- TIER S — FAANG & Big Tech -->
+    {% set s_jobs = jobs | selectattr('tier', 'equalto', 'S') | list %}
+    {% if s_jobs %}
+    <div class="section-label" data-section="faang">
+      <div class="section-title" style="color:#60a5fa;">🏆 FAANG & Big Tech</div>
+      <div class="section-line"></div>
+      <div class="count-badge">{{ s_jobs | length }} listing{{ 's' if s_jobs | length != 1 }}</div>
+    </div>
+    <div class="grid" data-grid="faang">
+      {% set ns = namespace(idx=urgent_list|length if urgent_list else 0) %}
+      {% for job in s_jobs %}
+      {% set ns.idx = ns.idx + 1 %}
+      {{ render_job_card(job, ns.idx) }}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- TIER A — Startups & Unicorns -->
+    {% set a_jobs = jobs | selectattr('tier', 'equalto', 'A') | list %}
+    {% if a_jobs %}
+    <div class="section-label" data-section="startup">
+      <div class="section-title" style="color:#f472b6;">🚀 Startups & Unicorns</div>
+      <div class="section-line"></div>
+      <div class="count-badge">{{ a_jobs | length }} listing{{ 's' if a_jobs | length != 1 }}</div>
+    </div>
+    <div class="grid" data-grid="startup">
+      {% set ns2 = namespace(idx=(urgent_list|length if urgent_list else 0) + s_jobs|length) %}
+      {% for job in a_jobs %}
+      {% set ns2.idx = ns2.idx + 1 %}
+      {{ render_job_card(job, ns2.idx) }}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- TIER B — Research & Other -->
+    {% set b_jobs = jobs | selectattr('tier', 'equalto', 'B') | list %}
+    {% if b_jobs %}
+    <div class="section-label" data-section="research">
+      <div class="section-title" style="color:#a78bfa;">🔬 Research Labs & Other Opportunities</div>
+      <div class="section-line"></div>
+      <div class="count-badge">{{ b_jobs | length }} listing{{ 's' if b_jobs | length != 1 }}</div>
+    </div>
+    <div class="grid" data-grid="research">
+      {% set ns3 = namespace(idx=(urgent_list|length if urgent_list else 0) + s_jobs|length + a_jobs|length) %}
+      {% for job in b_jobs %}
+      {% set ns3.idx = ns3.idx + 1 %}
+      {{ render_job_card(job, ns3.idx) }}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- No Results -->
+    <div class="no-results" id="noResults" style="display: none;">
+      <div class="no-results-icon">🔍</div>
+      <h3>No matches found</h3>
+      <p>Try adjusting your filters or search terms.</p>
+    </div>
+
+    <!-- AI Action Plan Note -->
+    {% if action_plan %}
+    <div class="note">
+      <strong>📋 AI Action Plan:</strong><br><br>
+      {{ action_plan | safe }}
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Back Link -->
+  <a href="{{ url_for('index') }}" class="back-link">← Upload Another Resume</a>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

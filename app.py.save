@@ -1,0 +1,80 @@
+from flask import Flask, render_template, request, redirect, url_for
+import os
+
+app = Flask(__name__)
+
+# Tells Flask where to save the uploaded resumes
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# ROUTE 1: The Home Page (Upload Screen)
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# ROUTE 2: Handling the file upload
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'resume' not in request.files:
+        return redirect(request.url)
+    
+    file = request.files['resume']
+    if file.filename == '':
+        return redirect(request.url)
+    
+    if file:
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(filepath)
+        # Send them to the results page after uploading!
+        return redirect(url_for('results'))
+
+# ROUTE 3: The Results Page
+@app.route('/results')
+def results():
+    # This is the dummy data that perfectly matches the variables in your HTML
+    dummy_jobs_data = [
+        {
+            "company": "Google",
+            "role": "SWE Intern Summer 2026",
+            "tier": "S",
+            "categories": ["tier-s", "all"],
+            "stipend": "₹1L/mo",
+            "location": "Bangalore",
+            "duration": "12 weeks",
+            "mode": "On-site",
+            "match_pct": 95,
+            "skills": ["Python", "C++", "DSA"],
+            "apply_url": "#"
+        },
+        {
+            "company": "Razorpay",
+            "role": "Backend Engineering Intern",
+            "tier": "A",
+            "categories": ["tier-a", "remote", "all"],
+            "stipend": "₹50K/mo",
+            "location": "Remote",
+            "duration": "6 months",
+            "mode": "Remote",
+            "match_pct": 88,
+            "skills": ["Python", "Django", "APIs"],
+            "apply_url": "#"
+        },
+        {
+            "company": "IIT Delhi",
+            "role": "Summer Research Intern",
+            "tier": "Research",
+            "categories": ["research", "all"],
+            "stipend": "₹15K/mo",
+            "location": "New Delhi",
+            "duration": "8 weeks",
+            "mode": "On-site",
+            "match_pct": 92,
+            "skills": ["Python", "Research", "Algorithms"],
+            "apply_url": "#"
+        }
+    ]
+    
+    return render_template('results.html', jobs=dummy_jobs_data)
+
+if __name__ == '__main__':
+    app.run(debug=True)
