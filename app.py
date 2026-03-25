@@ -1319,4 +1319,6 @@ def _call_ai(prompt: str, max_retries: int = 2):
 # ============================================
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('RENDER') is None  # Debug only in local dev
+    app.run(debug=debug, host='0.0.0.0', port=port)
