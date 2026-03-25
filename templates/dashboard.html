@@ -55,8 +55,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Your personalized internship matches powered by AI analysis of your resume.">
-  <title>Your Matches — InternFinder</title>
+  <meta name="description" content="Your personalized matches powered by AI analysis of your resume.">
+  <title>Your Matches — OpportunityFinder</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
@@ -64,10 +64,20 @@
 
   <!-- Header -->
   <div class="dash-header">
-    <div class="live-badge">
-      <div class="pulse"></div> AI-Curated · Live Results
+    <div class="dash-logo">
+      <a href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OpportunityFinder Logo" class="dash-logo-img" />
+      </a>
     </div>
-    <h1>Your Personalized Internship Matches</h1>
+    <div class="live-badge">
+      <div class="pulse"></div>
+      {% if is_stale %}
+        ⚠️ Results from {{ generated_at }} · <a href="{{ url_for('index') }}" style="color:#fbbf24;text-decoration:underline;">Refresh for latest</a>
+      {% else %}
+        AI-Curated · Live Results · Updated {{ generated_at }}
+      {% endif %}
+    </div>
+    <h1>Your Personalized {% if search_type == 'job' %}Job{% else %}Internship{% endif %} Matches</h1>
     <div class="header-sub">Curated for <span>your profile</span> · Based on your resume analysis</div>
     <div class="stats-strip">
       <div class="stat-pill">
@@ -86,14 +96,39 @@
         <div class="lbl">FAANG Tier</div>
       </div>
       <div class="stat-pill">
+        <div class="num">{{ verified_count }}/{{ total_count }}</div>
+        <div class="lbl">Verified Live</div>
+      </div>
+      <div class="stat-pill">
         <div class="num">
           {% set urgent_jobs = jobs | selectattr('deadline_status', 'equalto', 'urgent') | list %}
           {{ urgent_jobs | length }}
         </div>
         <div class="lbl">Closing Soon</div>
       </div>
+      <div class="stat-pill">
+        <div class="num">{{ sources_used | length }}</div>
+        <div class="lbl">Sources</div>
+      </div>
     </div>
+
+    <!-- Source Platforms -->
+    {% if sources_used %}
+    <div class="sources-strip">
+      {% for src in sources_used %}
+      <span class="source-chip">{{ src }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
   </div>
+
+  <!-- Stale Results Warning -->
+  {% if is_stale %}
+  <div class="alert-banner" style="background:rgba(251,191,36,0.15);border-left:4px solid #fbbf24;">
+    ⚠️ <strong>These results are {{ generated_at }} old.</strong>&nbsp;
+    Job listings change quickly — <a href="{{ url_for('index') }}" style="color:#fbbf24;font-weight:600;">re-upload your resume</a> for the freshest matches.
+  </div>
+  {% endif %}
 
   <!-- Alert Banner for Urgent -->
   {% set urgent_jobs = jobs | selectattr('deadline_status', 'equalto', 'urgent') | list %}

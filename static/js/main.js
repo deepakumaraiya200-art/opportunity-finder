@@ -1,9 +1,45 @@
 /* ============================================
-   INTERNFINDER — CLIENT-SIDE LOGIC
+   OPPORTUNITYFINDER — CLIENT-SIDE LOGIC
    Upload UX + Dashboard Filters
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  // ---- MODE TOGGLE LOGIC ----
+  const modeInternBtn = document.getElementById('modeIntern');
+  const modeJobBtn = document.getElementById('modeJob');
+  const modeSlider = document.getElementById('modeSlider');
+  const searchTypeInput = document.getElementById('searchType');
+  const countLabel = document.getElementById('countLabel');
+  const lstepFindText = document.getElementById('lstepFindText');
+
+  let currentMode = 'intern'; // default
+
+  function setMode(mode) {
+    currentMode = mode;
+    if (searchTypeInput) searchTypeInput.value = mode;
+
+    if (mode === 'job') {
+      modeInternBtn.classList.remove('active');
+      modeJobBtn.classList.add('active');
+      if (modeSlider) modeSlider.classList.add('right');
+      if (countLabel) countLabel.textContent = '📊 Number of jobs to show';
+      if (lstepFindText) lstepFindText.textContent = 'Finding Jobs';
+    } else {
+      modeJobBtn.classList.remove('active');
+      modeInternBtn.classList.add('active');
+      if (modeSlider) modeSlider.classList.remove('right');
+      if (countLabel) countLabel.textContent = '📊 Number of internships to show';
+      if (lstepFindText) lstepFindText.textContent = 'Finding Internships';
+    }
+  }
+
+  if (modeInternBtn) {
+    modeInternBtn.addEventListener('click', () => setMode('intern'));
+  }
+  if (modeJobBtn) {
+    modeJobBtn.addEventListener('click', () => setMode('job'));
+  }
 
   // ---- UPLOAD PAGE LOGIC ----
   const dropZone = document.getElementById('dropZone');
@@ -84,6 +120,75 @@ document.addEventListener('DOMContentLoaded', () => {
       jobCountSlider.addEventListener('input', () => {
         countValue.textContent = jobCountSlider.value;
       });
+    }
+
+    // ---- ROLE SELECTOR LOGIC ----
+    const roleSelectorHeader = document.getElementById('roleSelectorHeader');
+    const roleDropdown = document.getElementById('roleDropdown');
+    const roleSelectorArrow = document.getElementById('roleSelectorArrow');
+    const roleChosenLabel = document.getElementById('roleChosen');
+    const targetRoleInput = document.getElementById('targetRole');
+    const roleOtherInput = document.getElementById('roleOtherInput');
+    const roleOtherBtn = document.getElementById('roleOtherBtn');
+
+    if (roleSelectorHeader && roleDropdown) {
+      // Toggle dropdown
+      roleSelectorHeader.addEventListener('click', () => {
+        roleDropdown.classList.toggle('open');
+        roleSelectorArrow.classList.toggle('open');
+      });
+
+      // Track selected roles
+      const selectedRoles = new Set();
+
+      function updateRoleInput() {
+        const rolesArray = [...selectedRoles];
+        targetRoleInput.value = rolesArray.join(', ');
+        if (rolesArray.length === 0) {
+          roleChosenLabel.textContent = 'Select roles (optional)';
+          roleChosenLabel.classList.remove('active');
+        } else if (rolesArray.length === 1) {
+          roleChosenLabel.textContent = rolesArray[0];
+          roleChosenLabel.classList.add('active');
+        } else {
+          roleChosenLabel.textContent = `${rolesArray.length} roles selected`;
+          roleChosenLabel.classList.add('active');
+        }
+      }
+
+      // Chip toggle (multi-select)
+      const allChips = document.querySelectorAll('.role-chip');
+      allChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          const role = chip.dataset.role;
+          if (chip.classList.contains('selected')) {
+            chip.classList.remove('selected');
+            selectedRoles.delete(role);
+          } else {
+            chip.classList.add('selected');
+            selectedRoles.add(role);
+          }
+          updateRoleInput();
+        });
+      });
+
+      // "Other" custom role — adds to selection
+      if (roleOtherBtn && roleOtherInput) {
+        roleOtherBtn.addEventListener('click', () => {
+          const customRole = roleOtherInput.value.trim();
+          if (!customRole) return;
+          selectedRoles.add(customRole);
+          roleOtherInput.value = '';
+          updateRoleInput();
+        });
+        // Allow Enter key to submit custom role
+        roleOtherInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            roleOtherBtn.click();
+          }
+        });
+      }
     }
 
     if (uploadForm) {
@@ -210,22 +315,25 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('lstep-3'),
     ];
 
+    const modeLabel = currentMode === 'job' ? 'Jobs' : 'Internships';
+    const modeLabel2 = currentMode === 'job' ? 'job' : 'internship';
+
     const phases = [
       { step: 0, title: 'Reading Your Resume', sub: 'Parsing PDF and extracting text', pctStart: 0, pctEnd: 8, duration: 2000 },
       { step: 1, title: 'Extracting Your Skills', sub: 'AI is analyzing your technical expertise', pctStart: 8, pctEnd: 25, duration: 10000 },
-      { step: 2, title: 'Scanning Job Platforms', sub: 'Searching Internshala, Unstop, LinkedIn, RemoteOK & more', pctStart: 25, pctEnd: 50, duration: 15000 },
-      { step: 3, title: 'AI Scoring & Matching', sub: 'Calculating personalized match percentages for each job', pctStart: 50, pctEnd: 92, duration: 30000 },
+      { step: 2, title: `Scanning ${modeLabel} Platforms`, sub: 'Searching Internshala, Unstop, LinkedIn, RemoteOK & more', pctStart: 25, pctEnd: 50, duration: 15000 },
+      { step: 3, title: 'AI Scoring & Matching', sub: `Calculating personalized match percentages for each ${modeLabel2}`, pctStart: 50, pctEnd: 92, duration: 30000 },
     ];
 
     const funFacts = [
       '💡 We scan 5+ job platforms including Internshala, Unstop & LinkedIn',
-      '🎯 Each job is scored against your specific resume skills',
+      `🎯 Each ${modeLabel2} is scored against your specific resume skills`,
       '🇮🇳 Results are filtered to show India-based & remote opportunities',
       '⚡ All job platforms are searched simultaneously for speed',
       '✅ Apply links go directly to the company\'s career page',
       '🧠 AI analyzes both your skills AND experience level',
-      '🔥 Urgent listings are flagged so you never miss a deadline',
-      '📊 Match percentages are based on skill overlap analysis',
+      `🔥 Urgent listings are flagged so you never miss a deadline`,
+      `📊 Match percentages are based on skill overlap analysis`,
     ];
 
     let factIndex = 0;

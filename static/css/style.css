@@ -1,5 +1,5 @@
 /* ============================================
-   INTERNFINDER — DESIGN SYSTEM
+   OPPORTUNITYFINDER — DESIGN SYSTEM
    Dark-themed, green-accent, premium aesthetic
    ============================================ */
 
@@ -133,27 +133,57 @@ body {
   animation: fadeInDown 0.8s ease-out;
 }
 
-.brand-icon {
-  width: 64px;
-  height: 64px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 16px;
-  display: inline-flex;
-  align-items: center;
+/* --- Upload Page Logo --- */
+.brand-logo {
+  display: flex;
   justify-content: center;
-  font-size: 28px;
-  margin-bottom: 20px;
-  box-shadow: 0 0 40px rgba(74, 222, 128, 0.2);
+  margin-bottom: 12px;
 }
 
-.brand h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #fff 40%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.02em;
+.logo-img {
+  max-width: 280px;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  filter: drop-shadow(0 0 30px rgba(74, 222, 128, 0.15)) drop-shadow(0 4px 20px rgba(0,0,0,0.3));
+  animation: logoFadeIn 1s ease-out;
+  transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.03);
+}
+
+@keyframes logoFadeIn {
+  from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.brand-tagline {
+  color: var(--muted);
+  font-size: 1.1rem;
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+/* --- Dashboard Logo --- */
+.dash-logo {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.dash-logo-img {
+  max-width: 140px;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  filter: drop-shadow(0 0 20px rgba(74, 222, 128, 0.12));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.dash-logo-img:hover {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 30px rgba(74, 222, 128, 0.25));
 }
 
 .brand p {
@@ -180,6 +210,73 @@ body {
 .upload-card:hover {
   border-color: rgba(74, 222, 128, 0.3);
   box-shadow: 0 0 40px rgba(74, 222, 128, 0.1);
+}
+
+/* --- Mode Toggle (Intern / Job) --- */
+.mode-toggle {
+  display: flex;
+  position: relative;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.15s ease;
+  position: relative;
+  z-index: 2;
+  user-select: none;
+}
+
+.mode-btn:hover {
+  color: var(--text);
+}
+
+.mode-btn.active {
+  color: #0c0e14;
+}
+
+.mode-icon {
+  font-size: 1.1rem;
+  transition: transform 0.3s ease;
+}
+
+.mode-btn.active .mode-icon {
+  transform: scale(1.15);
+}
+
+.mode-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: var(--accent);
+  border-radius: 9px;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  box-shadow: 0 2px 12px rgba(74, 222, 128, 0.25);
+}
+
+.mode-slider.right {
+  transform: translateX(100%);
 }
 
 /* --- Drop Zone --- */
@@ -413,6 +510,183 @@ body {
   margin-top: 6px;
   font-size: 10px;
   color: var(--muted);
+}
+
+/* --- Role Selector --- */
+.role-selector {
+  margin-top: 18px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.role-selector-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.role-selector-header:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.role-selector-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.role-selector-chosen {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-left: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+  transition: color 0.3s ease;
+}
+
+.role-selector-chosen.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.role-selector-arrow {
+  font-size: 1rem;
+  color: var(--muted);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.role-selector-arrow.open {
+  transform: rotate(180deg);
+}
+
+.role-dropdown {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.role-dropdown.open {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.role-dropdown::-webkit-scrollbar {
+  width: 5px;
+}
+.role-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+}
+
+.role-category {
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.role-category-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.role-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.role-chip {
+  padding: 6px 13px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.role-chip:hover {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(74, 222, 128, 0.15);
+}
+
+.role-chip.selected {
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.25), rgba(59, 130, 246, 0.2));
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.2);
+}
+
+/* Other role input */
+.role-category-other {
+  padding-bottom: 16px;
+}
+
+.role-other-input-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.role-other-input {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.role-other-input:focus {
+  border-color: var(--accent);
+}
+
+.role-other-input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.role-other-btn {
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  background: rgba(74, 222, 128, 0.1);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.role-other-btn:hover {
+  background: rgba(74, 222, 128, 0.2);
+  transform: translateY(-1px);
 }
 
 /* --- Loading Overlay (Premium) --- */
@@ -747,6 +1021,41 @@ body {
 }
 
 /* --- Alert Banner --- */
+.alert-banner a {
+  color: inherit;
+  font-weight: 600;
+}
+
+/* --- Sources Strip --- */
+.sources-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(96, 165, 250, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  color: var(--accent2);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: var(--transition);
+}
+
+.source-chip:hover {
+  background: rgba(96, 165, 250, 0.15);
+  border-color: rgba(96, 165, 250, 0.4);
+  transform: translateY(-1px);
+}
+
 .alert-banner {
   background: rgba(251, 146, 60, 0.08);
   border-top: 1px solid rgba(251, 146, 60, 0.2);

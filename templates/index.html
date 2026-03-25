@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Upload your resume and let AI find the perfect internship matches for your skills and experience.">
-  <title>InternFinder — AI-Powered Internship Matching</title>
+  <meta name="description" content="Upload your resume and let AI find the perfect internship or job matches for your skills and experience.">
+  <title>OpportunityFinder — AI-Powered Career Matching</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -21,14 +21,27 @@
 
     <!-- Branding -->
     <div class="brand">
-      <div class="brand-icon">🎯</div>
-      <h1>InternFinder</h1>
-      <p>AI-powered internship matching — upload your resume, get results instantly.</p>
+      <div class="brand-logo">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OpportunityFinder Logo" class="logo-img" />
+      </div>
+      <p class="brand-tagline">AI-powered career matching — upload your resume, get results instantly.</p>
     </div>
 
     <!-- Upload Card -->
     <div class="upload-card">
       <form id="uploadForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+
+        <!-- Mode Toggle: Internship / Job -->
+        <div class="mode-toggle" id="modeToggle">
+          <button type="button" class="mode-btn active" data-mode="intern" id="modeIntern">
+            <span class="mode-icon">🎓</span> Internship
+          </button>
+          <button type="button" class="mode-btn" data-mode="job" id="modeJob">
+            <span class="mode-icon">💼</span> Job
+          </button>
+          <div class="mode-slider" id="modeSlider"></div>
+        </div>
+        <input type="hidden" name="search_type" id="searchType" value="intern">
 
         <!-- Drop Zone -->
         <div class="drop-zone" id="dropZone">
@@ -51,10 +64,10 @@
           <button type="button" class="file-preview-remove" id="removeFile">✕</button>
         </div>
 
-        <!-- Internship Count Selector -->
+        <!-- Count Selector -->
         <div class="count-selector" id="countSelector">
           <label for="jobCount">
-            <span class="count-label">📊 Number of internships to show</span>
+            <span class="count-label" id="countLabel">📊 Number of internships to show</span>
             <span class="count-value" id="countValue">20</span>
           </label>
           <input type="range" name="job_count" id="jobCount" min="10" max="50" value="20" step="5">
@@ -62,6 +75,144 @@
             <span>10</span>
             <span>Fewer but best matches</span>
             <span>50</span>
+          </div>
+        </div>
+
+        <!-- Role Selector -->
+        <div class="role-selector" id="roleSelector">
+          <div class="role-selector-header" id="roleSelectorHeader">
+            <span class="role-selector-label">🎯 What roles are you targeting?</span>
+            <span class="role-selector-chosen" id="roleChosen">Select roles (optional)</span>
+            <span class="role-selector-arrow" id="roleSelectorArrow">▾</span>
+          </div>
+          <input type="hidden" name="target_role" id="targetRole" value="">
+
+          <div class="role-dropdown" id="roleDropdown">
+
+            <!-- 💻 Software Engineering & Development -->
+            <div class="role-category">
+              <div class="role-category-title">💻 Software Engineering & Development</div>
+              <div class="role-chips">
+                <button type="button" class="role-chip" data-role="Software Engineer (SDE)">Software Engineer (SDE)</button>
+                <button type="button" class="role-chip" data-role="Frontend Developer">Frontend Developer</button>
+                <button type="button" class="role-chip" data-role="Backend Developer">Backend Developer</button>
+                <button type="button" class="role-chip" data-role="Full Stack Developer">Full Stack Developer</button>
+                <button type="button" class="role-chip" data-role="Mobile Developer (iOS/Android)">Mobile Developer (iOS/Android)</button>
+                <button type="button" class="role-chip" data-role="Cloud/DevOps Engineer">Cloud/DevOps Engineer</button>
+                <button type="button" class="role-chip" data-role="Site Reliability Engineer (SRE)">Site Reliability Engineer (SRE)</button>
+                <button type="button" class="role-chip" data-role="Security/Cybersecurity Engineer">Security/Cybersecurity Engineer</button>
+                <button type="button" class="role-chip" data-role="Game Developer">Game Developer</button>
+                <button type="button" class="role-chip" data-role="Embedded Systems Engineer">Embedded Systems Engineer</button>
+                <button type="button" class="role-chip" data-role="QA/Test Engineer">QA/Test Engineer</button>
+                <button type="button" class="role-chip" data-role="Platform Engineer">Platform Engineer</button>
+                <button type="button" class="role-chip" data-role="API/Integration Engineer">API/Integration Engineer</button>
+                <button type="button" class="role-chip" data-role="Blockchain Developer">Blockchain Developer</button>
+              </div>
+            </div>
+
+            <!-- 🤖 AI, ML & Data Science -->
+            <div class="role-category">
+              <div class="role-category-title">🤖 AI, ML & Data Science</div>
+              <div class="role-chips">
+                <button type="button" class="role-chip" data-role="Machine Learning Engineer">Machine Learning Engineer</button>
+                <button type="button" class="role-chip" data-role="AI Engineer">AI Engineer</button>
+                <button type="button" class="role-chip" data-role="Data Scientist">Data Scientist</button>
+                <button type="button" class="role-chip" data-role="Data Analyst">Data Analyst</button>
+                <button type="button" class="role-chip" data-role="Data Engineer">Data Engineer</button>
+                <button type="button" class="role-chip" data-role="Business Intelligence (BI) Analyst">BI Analyst</button>
+                <button type="button" class="role-chip" data-role="NLP Engineer">NLP Engineer</button>
+                <button type="button" class="role-chip" data-role="Computer Vision Engineer">Computer Vision Engineer</button>
+                <button type="button" class="role-chip" data-role="MLOps Engineer">MLOps Engineer</button>
+                <button type="button" class="role-chip" data-role="Research Scientist">Research Scientist</button>
+              </div>
+            </div>
+
+            <!-- 🚀 Product & Management -->
+            <div class="role-category">
+              <div class="role-category-title">🚀 Product & Management</div>
+              <div class="role-chips">
+                <button type="button" class="role-chip" data-role="Product Manager (PM)">Product Manager (PM)</button>
+                <button type="button" class="role-chip" data-role="Technical Product Manager (TPM)">Technical Product Manager</button>
+                <button type="button" class="role-chip" data-role="Program Manager">Program Manager</button>
+                <button type="button" class="role-chip" data-role="Project Manager">Project Manager</button>
+                <button type="button" class="role-chip" data-role="Scrum Master">Scrum Master</button>
+                <button type="button" class="role-chip" data-role="Engineering Manager">Engineering Manager</button>
+                <button type="button" class="role-chip" data-role="Delivery Manager">Delivery Manager</button>
+                <button type="button" class="role-chip" data-role="Agile Coach">Agile Coach</button>
+              </div>
+            </div>
+
+            <!-- 🎨 Design & User Experience -->
+            <div class="role-category">
+              <div class="role-category-title">🎨 Design & User Experience</div>
+              <div class="role-chips">
+                <button type="button" class="role-chip" data-role="UI/UX Designer">UI/UX Designer</button>
+                <button type="button" class="role-chip" data-role="Product Designer">Product Designer</button>
+                <button type="button" class="role-chip" data-role="UX Researcher">UX Researcher</button>
+                <button type="button" class="role-chip" data-role="UX Writer/Content Designer">UX Writer / Content Designer</button>
+                <button type="button" class="role-chip" data-role="Graphic/Visual Designer">Graphic / Visual Designer</button>
+                <button type="button" class="role-chip" data-role="Motion Designer">Motion Designer</button>
+                <button type="button" class="role-chip" data-role="Interaction Designer">Interaction Designer</button>
+              </div>
+            </div>
+
+            <!-- 💼 Consulting & Strategy -->
+            <div class="role-category">
+              <div class="role-category-title">💼 Consulting & Strategy</div>
+              <div class="role-chips">
+                <button type="button" class="role-chip" data-role="Management Consultant">Management Consultant</button>
+                <button type="button" class="role-chip" data-role="Strategy Consultant">Strategy Consultant</button>
+                <button type="button" class="role-chip" data-role="Technology Consultant">Technology Consultant</button>
+                <button type="button" class="role-chip" data-role="Solution Architect">Solution Architect</button>
+                <button type="button" class="role-chip" data-role="Business Operations (BizOps) Analyst">BizOps Analyst</button>
+                <button type="button" class="role-chip" data-role="Business Analyst">Business Analyst</button>
+                <button type="button" class="role-chip" data-role="Pre-Sales Consultant">Pre-Sales Consultant</button>
+              </div>
+            </div>
+
+            <!-- 📈 Finance & Quantitative -->
+            <div class="role-category">
+              <div class="role-category-title">📈 Finance & Quantitative</div>
+              <div class="role-chips">
+                <button type="button" class="role-chip" data-role="Financial Analyst">Financial Analyst</button>
+                <button type="button" class="role-chip" data-role="Investment Banking Analyst">Investment Banking Analyst</button>
+                <button type="button" class="role-chip" data-role="Corporate Finance Analyst">Corporate Finance Analyst</button>
+                <button type="button" class="role-chip" data-role="Private Equity Analyst">Private Equity Analyst</button>
+                <button type="button" class="role-chip" data-role="Risk Analyst">Risk Analyst</button>
+                <button type="button" class="role-chip" data-role="Quantitative Analyst (Quant)">Quantitative Analyst (Quant)</button>
+                <button type="button" class="role-chip" data-role="Actuarial Analyst">Actuarial Analyst</button>
+                <button type="button" class="role-chip" data-role="Credit Analyst">Credit Analyst</button>
+                <button type="button" class="role-chip" data-role="Equity Research Analyst">Equity Research Analyst</button>
+              </div>
+            </div>
+
+            <!-- 🤝 Sales, Marketing & Operations -->
+            <div class="role-category">
+              <div class="role-category-title">🤝 Sales, Marketing & Operations</div>
+              <div class="role-chips">
+                <button type="button" class="role-chip" data-role="Operations Manager/Analyst">Operations Manager / Analyst</button>
+                <button type="button" class="role-chip" data-role="Marketing Manager">Marketing Manager</button>
+                <button type="button" class="role-chip" data-role="Growth Marketer">Growth Marketer</button>
+                <button type="button" class="role-chip" data-role="Sales Engineer">Sales Engineer</button>
+                <button type="button" class="role-chip" data-role="Account Executive / B2B Sales">Account Executive / B2B Sales</button>
+                <button type="button" class="role-chip" data-role="Human Resources (HR)">Human Resources (HR)</button>
+                <button type="button" class="role-chip" data-role="Talent Acquisition Specialist">Talent Acquisition Specialist</button>
+                <button type="button" class="role-chip" data-role="Digital Marketing Specialist">Digital Marketing Specialist</button>
+                <button type="button" class="role-chip" data-role="SEO/SEM Specialist">SEO/SEM Specialist</button>
+                <button type="button" class="role-chip" data-role="Content Strategist">Content Strategist</button>
+                <button type="button" class="role-chip" data-role="Supply Chain Analyst">Supply Chain Analyst</button>
+              </div>
+            </div>
+
+            <!-- 🔧 Other -->
+            <div class="role-category role-category-other">
+              <div class="role-category-title">🔧 Other (Specify Your Own)</div>
+              <div class="role-other-input-wrap">
+                <input type="text" class="role-other-input" id="roleOtherInput" placeholder="e.g. Robotics Engineer, Technical Writer..." />
+                <button type="button" class="role-other-btn" id="roleOtherBtn">Add ✓</button>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -107,7 +258,7 @@
         <div class="lstep-connector"></div>
         <div class="lstep" id="lstep-2">
           <div class="lstep-icon">🔍</div>
-          <div class="lstep-text">Finding Jobs</div>
+          <div class="lstep-text" id="lstepFindText">Finding Jobs</div>
         </div>
         <div class="lstep-connector"></div>
         <div class="lstep" id="lstep-3">
